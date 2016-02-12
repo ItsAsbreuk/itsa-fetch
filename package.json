@@ -1,7 +1,7 @@
 {
-  "name": "itsa-io",
-  "version": "1.1.3",
-  "description": "Promised IO",
+  "name": "itsa-fetch",
+  "version": "0.0.1",
+  "description": "Fetch implementation: Promised based IO",
   "author": [
     {
       "name": "Marco Asbreuk",
@@ -10,10 +10,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/itsa/io"
+    "url": "https://github.com/ItsAsbreuk/itsa-fetch"
   },
   "bugs": {
-    "url": "https://github.com/itsa/io/issues"
+    "url": "https://github.com/ItsAsbreuk/itsa-fetch/issues"
   },
   "keywords": [
     "itsa",
@@ -49,9 +49,9 @@
     "yuidocjs": "^0.9.0"
   },
   "scripts": {
-    "pretest": "eslint  ./**/*.jsx?",
+    "pretest": "eslint  ./**/*.js",
     "test": "mocha 'tests/*.js' --compilers js:babel-core/register",
-    "lint": "eslint ./**/*.jsx?",
+    "lint": "eslint ./**/*.js",
     "build": "webpack && yuidoc ./lib -q -c ./yuidoc.json"
   },
   "maintainers": [
