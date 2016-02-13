@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.org/itsa/io.svg?branch=master)](https://travis-ci.org/itsa/io)
+[![Build Status](https://travis-ci.org/ItsAsbreuk/itsa-jsext.svg?branch=master)](https://travis-ci.org/ItsAsbreuk/itsa-fetch)
 
-[![browser support](https://ci.testling.com/itsa/io.png)](https://ci.testling.com/itsa/io)
+[![browser support](https://ci.testling.com/ItsAsbreuk/itsa-fetch.png)](https://ci.testling.com/ItsAsbreuk/itsa-fetch)
 
 `itsa-fetch` is currently not `fetch`-compatable. It has full promise-io functionality though. We will make it `fetch`-compatable as from version 1.0.0
 
