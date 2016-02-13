@@ -8,7 +8,7 @@ require("chai").should();
 require("itsa-jsext");
 
 var isNode = (typeof global!=="undefined") && ({}.toString.call(global)==="[object global]") && (!global.document || ({}.toString.call(global.document)!=="[object HTMLDocument]")),
-    IO = isNode ? require("../lib/io-node") : require("../lib/io-browser"),
+    IO = isNode ? require("../extra/io-node") : require("../extra/io-browser"),
     URL = "http://servercors.itsa.io/io",
     block2k = "",
     xdr, testxhr, xhr2support, i;

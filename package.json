@@ -1,6 +1,6 @@
 {
   "name": "itsa-fetch",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "description": "Fetch implementation: Promised based IO",
   "author": [
     {
@@ -23,7 +23,9 @@
   ],
   "main": "./lib/fetch.js",
   "directories": {
-    "lib": "./lib"
+    "lib": "./lib",
+    "extra": "./extra",
+    "helpers": "./helpers"
   },
   "dependencies": {
     "itsa-jsext": "0.0.1",
