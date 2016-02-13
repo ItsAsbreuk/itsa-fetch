@@ -11,7 +11,7 @@ require("itsa-jsext");
 var GENERATOR_ID = "ITSA-FILETRANS",
     MIME_BLOB = "application/octet-stream",
     CONTENT_TYPE = "Content-Type",
-    idGenerator = require("utils").idGenerator,
+    idGenerator = require("itsa-utils").idGenerator,
     DEFAULT_TIMEOUT = 300000, // 5 minutes
     STRING = "string",
     REVIVER = function(key, value) {

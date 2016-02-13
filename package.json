@@ -1,6 +1,6 @@
 {
   "name": "itsa-fetch",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Fetch implementation: Promised based IO",
   "author": [
     {
@@ -28,7 +28,7 @@
   "dependencies": {
     "itsa-jsext": "0.0.1",
     "querystring": "^0.2.0",
-    "utils": "itsa/utils",
+    "itsa-utils": "^0.0.2",
     "xmldom": "^0.1.22",
     "xmlhttprequest": "^1.8.0"
   },
@@ -41,7 +41,7 @@
     "css-loader": "^0.23.1",
     "eslint": "^1.10.3",
     "istanbul": "^0.3.0",
-    "itsa-classes": "^1.0.2",
+    "itsa-classes": "^1.0.3",
     "jsdom": "^7.2.2",
     "jsdom-global": "^1.6.1",
     "mocha": "^1.21.4",

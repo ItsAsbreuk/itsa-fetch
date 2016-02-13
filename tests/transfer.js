@@ -1,6 +1,4 @@
 /*global describe, it */
-/*jshint unused:false */
-
 
 "use strict";
 
