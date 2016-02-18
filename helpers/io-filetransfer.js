@@ -17,6 +17,7 @@ var GENERATOR_ID = "ITSA-FILETRANS",
     REVIVER = function(key, value) {
         return ((typeof value===STRING) && value.itsa_toDate()) || value;
     },
+    NOOP = function() {},
     ABORTED = "Request aborted",
     KB_25 = 25 * 1024, // 25kb
     KB_100 = 100 * 1024, // 100kb
@@ -213,77 +214,88 @@ var extendIO = function (IO) {
             });
         }
 
+        options.url = url;
+        options.method || (options.method="PUT");
+        options.url = url;
+        options.data = blob;
+        // delete hidden property `responseType`: don"t want accedentially to be used
+        delete options.responseType;
+
+        // Important: headers need to be deepCloned, otherwise all chuncks share the same headers
+        // and we dwant the last chunk to have different headers!
+        headers = options.headers ? options.headers.itsa_deepClone() : {};
+        // options.headers[CONTENT_TYPE] = blob.type || MIME_BLOB;
+        headers["X-Total-size"] = size;
+        headers[CONTENT_TYPE] = MIME_BLOB;
+
         instance._getClientId(url).then(function(clientId) {
-            options.url = url;
-            options.method || (options.method="PUT");
-            options.url = url;
-            options.data = blob;
-            // delete hidden property `responseType`: don"t want accedentially to be used
-            delete options.responseType;
+            if (!returnPromise._aborted) {
+                headers["X-TransId"] = idGenerator(GENERATOR_ID);
+                headers["X-ClientId"] = clientId;
+                headers[CONTENT_TYPE] = MIME_BLOB;
 
-            // Important: headers need to be deepCloned, otherwise all chuncks share the same headers
-            // and we dwant the last chunk to have different headers!
-            headers = options.headers ? options.headers.itsa_deepClone() : {};
-            // options.headers[CONTENT_TYPE] = blob.type || MIME_BLOB;
-            headers["X-TransId"] = idGenerator(GENERATOR_ID);
-            headers["X-ClientId"] = clientId;
-            headers["X-Total-size"] = size;
-            headers[CONTENT_TYPE] = MIME_BLOB;
-
-            if (size<=MB_1) {
-                chunkSize = KB_25;
-            }
-            else if (size<=MB_20) {
-                chunkSize = KB_100;
-            }
-            else {
-                chunkSize = KB_256;
-            }
-            end = chunkSize;
-            partialSize = chunkSize;
-            while (start < size) {
-                //push the fragments to an array
-                options.data = blob.slice(start, end);
-
-                start = end;
-                end = start + chunkSize;
-                headers["X-Partial"]= ++i;
-                options.headers = headers.itsa_deepClone();
-                if (start>=size) {
-                    // set the filename on the last request:
-                    options.headers["X-Filename"] = filename || "blob";
-                    Object.itsa_isObject(params) && (options.headers["x-data"]=JSON.stringify(params));
-                    partialSize = (size % chunkSize) || chunkSize;
+                if (size<=MB_1) {
+                    chunkSize = KB_25;
                 }
-                //upload the fragment to the server:
-                ioPromise = instance.request(options);
-                if (options.progressfn) {
-                    ioPromise._notify = notify;
-                    notifyResolved(ioPromise, partialSize);
+                else if (size<=MB_20) {
+                    chunkSize = KB_100;
                 }
-                promiseHash.push(ioPromise); // needed to be able to call `abort`
-                // we need to inspect the response for status==="busy" to know which promise holds the final
-                // value and should be used as the returnvalue. Therefore, create `hashPromise`
-                hashPromise = ioPromise.then(setXHR);
-                ioHash.push(hashPromise);
-            }
+                else {
+                    chunkSize = KB_256;
+                }
+                if (chunkSize>=size) {
+                    // min. 2 chunks needed: with only 1 chunk, cors will fail (?)
+                    chunkSize = Math.round(size/2) || size;
+                }
+                end = chunkSize;
+                partialSize = chunkSize;
+                while (start < size) {
+                    //push the fragments to an array
+                    options.data = blob.slice(start, end);
 
-            Promise.all(ioHash).then(
-                function() {
-                    returnPromise.fulfill(responseObject);
-                },
-                function(e) {
-                    returnPromise.reject(e);
+                    start = end;
+                    end = start + chunkSize;
+                    headers["X-Partial"]= ++i;
+                    options.headers = headers.itsa_deepClone();
+                    if (start>=size) {
+                        // set the filename on the last request:
+                        options.headers["X-Filename"] = filename || "blob";
+                        Object.itsa_isObject(params) && (options.headers["x-data"]=JSON.stringify(params));
+                        partialSize = (size % chunkSize) || chunkSize;
+                    }
+                    //upload the fragment to the server:
+                    ioPromise = instance.request(options);
+                    if (options.progressfn) {
+                        ioPromise._notify = notify;
+                        notifyResolved(ioPromise, partialSize);
+                    }
+                    promiseHash.push(ioPromise); // needed to be able to call `abort`
+                    // we need to inspect the response for status==="busy" to know which promise holds the final
+                    // value and should be used as the returnvalue. Therefore, create `hashPromise`
+                    hashPromise = ioPromise.then(setXHR);
+                    hashPromise.catch(NOOP);
+                    ioHash.push(hashPromise);
                 }
-            );
+
+                Promise.all(ioHash).then(
+                    function() {
+                        returnPromise.fulfill(responseObject);
+                    },
+                    function(e) {
+                        returnPromise.reject(e);
+                    }
+                );
+            }
+        }).catch(function(e) {
+            returnPromise.reject(e);
         });
-
         // set `abort` to the thennable-promise:
         returnPromise.abort = function() {
+            returnPromise._aborted = true;
             promiseHash.forEach(function(partialIO) {
                 partialIO.abort();
             });
-            returnPromise.reject(new Error(ABORTED));
+            returnPromise.reject(ABORTED);
         };
         return returnPromise;
     };

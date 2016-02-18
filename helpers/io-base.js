@@ -44,6 +44,8 @@ module.exports = function (XMLHttpRequest) {
     IO = {
         config: {},
 
+        supportXHR2: xhr2support,
+
         //===============================================================================================
         // private methods:
         //===============================================================================================
@@ -86,7 +88,7 @@ module.exports = function (XMLHttpRequest) {
             // xhr will be null in case of a CORS-request when no CORS is possible
             if (!xhr) {
                 console.error(NAME, "_initXHR fails: "+ERROR_NO_XHR);
-                reject(new Error(ERROR_NO_XHR));
+                reject(ERROR_NO_XHR);
                 return;
             }
 
@@ -129,7 +131,7 @@ module.exports = function (XMLHttpRequest) {
 
             // now add xhr.abort() to the promise, so we can call from within the returned promise-instance
             promise.abort = function() {
-                reject(new Error(ABORTED));
+                reject(ABORTED);
                 xhr._aborted = true; // must be set: IE9 won"t allow to read anything on xhr after being aborted
                 xhr.abort();
             };
@@ -205,13 +207,13 @@ module.exports = function (XMLHttpRequest) {
                         promise.fulfill(xhr);
                     }
                     else {
-                        promise.reject(new Error(xhr.statusText || (UNKNOW_ERROR)));
+                        promise.reject(xhr.statusText || (UNKNOW_ERROR));
                     }
                 }
             };
             xhr.onerror = function() {
                 clearTimeout(xhr._timer);
-                promise.reject(new Error(XHR_ERROR));
+                promise.reject(XHR_ERROR);
             };
         },
 
@@ -240,7 +242,7 @@ module.exports = function (XMLHttpRequest) {
         abortAll: function() {
             var instance = this;
             instance._runningRequests.forEach(function(promise) {
-                promise.itsa_abort();
+                promise.abort();
             });
             instance._runningRequests.length = 0;
         },
@@ -296,7 +298,7 @@ module.exports = function (XMLHttpRequest) {
                 enumerable: false,
                 writable: false,
                 value: setTimeout(function() {
-                           promise.reject(new Error(REQUEST_TIMEOUT));
+                           promise.reject(REQUEST_TIMEOUT);
                            xhr._aborted = true; // must be set: IE9 won"t allow to read anything on xhr after being aborted
                            xhr.abort();
                        }, options.timeout || instance.config.timeout || DEF_REQ_TIMEOUT)
