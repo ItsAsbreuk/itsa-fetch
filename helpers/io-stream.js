@@ -8,7 +8,7 @@
 var NAME = "[io-stream]: ";
 
 var UNKNOW_ERROR = "Unknown XDR-error", // XDR doesn"t specify the error
-    isNode = (typeof global!=="undefined") && ({}.toString.call(global)==="[object global]") && (!global.document || ({}.toString.call(global.document)!=="[object HTMLDocument]"));
+    isNode = require("itsa-utils").isNode;
 
 var extendIO = function (IO) {
 

@@ -80,7 +80,7 @@ module.exports = function (XMLHttpRequest) {
             var instance = this,
                 url = options.url,
                 method = options.method || GET,
-                headers = options.headers || {}, // all request will get some headers
+                headers = options.headers ? options.headers.itsa_deepClone() : {}, // all request will get some headers
                 async = !options.sync,
                 data = options.data,
                 reject = promise.reject,
@@ -91,6 +91,8 @@ module.exports = function (XMLHttpRequest) {
                 reject(ERROR_NO_XHR);
                 return;
             }
+            // adding default headers (when set):
+            headers.itsa_merge(instance._standardHeaders);
 
             // method-name should be in uppercase:
             method = method.toUpperCase();
@@ -234,6 +236,20 @@ module.exports = function (XMLHttpRequest) {
                 paramArray.push((value === null) ? key : (key + "=" + ENCODE_URI_COMPONENT(value)));
             }
             return paramArray.join("&");
+        },
+
+        _standardHeaders: {},
+
+        setStandardHeader: function(header, value) {
+            this._standardHeaders[header] = value;
+        },
+
+        removeStandardHeader: function(header) {
+            delete this._standardHeaders[header];
+        },
+
+        clearStandardHeader: function() {
+            this._standardHeaders = {};
         },
 
         /**
