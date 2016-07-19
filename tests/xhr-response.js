@@ -204,7 +204,7 @@ describe("Analysing params", function () {
             };
             IO.request(options).then(
                 function(response) {
-                    response.responseText.should.be.eql("Acknowledge "+(xdr ? "post" : "put")+"-request with data: undefined");
+                    response.responseText.should.be.eql("Acknowledge "+(xdr ? "post" : "put")+"-request with data: 25");
                     done();
                 }
             ).then(
@@ -238,7 +238,7 @@ describe("Analysing params", function () {
             };
             IO.request(options).then(
                 function(response) {
-                    response.responseText.should.be.eql("Acknowledge "+(xdr ? "post" : "put")+"-request with data: undefined");
+                    response.responseText.should.be.eql("Acknowledge "+(xdr ? "post" : "put")+"-request with data: 25");
                     done();
                 }
             ).then(
@@ -275,7 +275,7 @@ describe("Analysing params", function () {
             };
             IO.request(options).then(
                 function(response) {
-                    response.responseText.should.be.eql("Acknowledge post-request with data: undefined");
+                    response.responseText.should.be.eql("Acknowledge post-request with data: 25");
                     done();
                 }
             ).then(
@@ -309,7 +309,7 @@ describe("Analysing params", function () {
             };
             IO.request(options).then(
                 function(response) {
-                    response.responseText.should.be.eql("Acknowledge post-request with data: undefined");
+                    response.responseText.should.be.eql("Acknowledge post-request with data: 25");
                     done();
                 }
             ).then(
