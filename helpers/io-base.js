@@ -84,7 +84,7 @@ module.exports = function (XMLHttpRequest) {
                 async = !options.sync,
                 data = options.data,
                 reject = promise.reject,
-                sendPayload;
+                sendPayload, additionalData;
             // xhr will be null in case of a CORS-request when no CORS is possible
             if (!xhr) {
                 console.error(NAME, "_initXHR fails: "+ERROR_NO_XHR);
@@ -100,6 +100,11 @@ module.exports = function (XMLHttpRequest) {
             // else: append data-object behind querystring
             if (BODY_METHODS[method]) {
                 url = url.split("?"); // now url is an array
+                url[1] && (additionalData=instance._queryStringToDataObject(url[1]));
+                if (additionalData && !additionalData.itsa_isEmpty()) {
+                    data || (data={});
+                    data.itsa_merge(additionalData);
+                }
                 url = url[0]; // now url is a String again
             }
             else if (data && (headers[CONTENT_TYPE]!==MIME_BLOB)) {
@@ -107,7 +112,7 @@ module.exports = function (XMLHttpRequest) {
             }
 
             xhr.open(method, url, async);
-            // xhr.responseType = options.responseType || "text";
+            options.responseType && (xhr.responseType=options.responseType);
             options.withCredentials && (xhr.withCredentials=true);
 
 
@@ -236,6 +241,24 @@ module.exports = function (XMLHttpRequest) {
                 paramArray.push((value === null) ? key : (key + "=" + ENCODE_URI_COMPONENT(value)));
             }
             return paramArray.join("&");
+        },
+
+        /**
+         * Extracts an object based on the querystring. The object's values will be String-types.
+         *
+         * @method _queryStringToDataObject
+         * @param queryString {String}
+         * @return {Object|null} stringified presentation of the object, with every pair separated by `&`
+         * @private
+        */
+        _queryStringToDataObject: function(queryString) {
+            var args = queryString.split("&"),
+                data = {};
+            args.forEach(function(arg) {
+                var item = arg.split("=");
+                (item.length===2) && (data[item[0]]=item[1]);
+            });
+            return data;
         },
 
         _standardHeaders: {},
